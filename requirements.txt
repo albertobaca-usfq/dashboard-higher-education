@@ -4,3 +4,4 @@ networkx
 squarify
 openpyxl
 kaleido
+matplotlib
