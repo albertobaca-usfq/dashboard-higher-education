@@ -3,3 +3,4 @@ gdown
 networkx
 squarify
 openpyxl
+kaleido
