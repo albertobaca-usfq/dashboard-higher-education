@@ -107,6 +107,7 @@ fig.update_layout(
         'font_color': 'black'
     }],
     paper_bgcolor='white',
+    plot_bgcolor='white',
     font=dict(size=20),
     margin=dict(t=50, l=50, r=50, b=50),
     width=1000,
