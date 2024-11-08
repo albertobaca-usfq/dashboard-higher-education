@@ -1,4 +1,4 @@
-!pip install plotly gdown networkx squarify
+pip install plotly gdown networkx squarify
 
 
 import streamlit as st
