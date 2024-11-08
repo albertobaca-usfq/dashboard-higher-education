@@ -6,6 +6,10 @@ import gdown
 
 st.title('Higher Education in Ecuador')
 
+import streamlit as st
+import pandas as pd
+import gdown
+
 @st.cache_data
 def load_data(url):
     output = "base_matricula_datosabiertos.xlsx"
@@ -13,7 +17,15 @@ def load_data(url):
     return pd.read_excel(output, engine='openpyxl')
 
 def preprocess_data(df):
-    # Realiza todos los reemplazos y filtrados de datos aquí
+    # Verificar nombres de columnas
+    st.write("Columnas en el DataFrame:", df.columns)
+    
+    # Verificar si la columna 'NIVEL_FORMACIÓN' existe
+    if 'NIVEL_FORMACIÓN' not in df.columns:
+        st.error("La columna 'NIVEL_FORMACIÓN' no existe en el DataFrame.")
+        return df  # Devuelve el DataFrame sin cambios si falta la columna
+
+    # Realizar los reemplazos y filtrados de datos
     df['MODALIDAD'] = df['MODALIDAD'].replace(['HIBRIDA', 'DUAL'], 'SEMIPRESENCIAL')
     df['NIVEL_FORMACIÓN'] = df['NIVEL_FORMACIÓN'].replace(['TERCER NIVEL O PREGRADO'], 'PREGRADO')
     df['NIVEL_FORMACIÓN'] = df['NIVEL_FORMACIÓN'].replace(['CUARTO NIVEL O POSGRADO'], 'POSGRADO')
@@ -24,11 +36,12 @@ def preprocess_data(df):
     df['CAMPO_AMPLIO'] = df['CAMPO_AMPLIO'].replace(['TECNOLOGIAS DE LA INFORMACION Y LA COMUNICACION (TIC)'], 'TECNOLOGIAS DE LA INFORMACION')
     df['TIPO_FINANCIAMIENTO'] = df['TIPO_FINANCIAMIENTO'].replace(['PARTICULAR COFINANCIADA'], 'PARTICULAR')
     df['TIPO_FINANCIAMIENTO'] = df['TIPO_FINANCIAMIENTO'].replace(['PARTICULAR AUTOFINANCIADA'], 'PARTICULAR')
+    
+    # Filtrar los datos si la columna existe
     df = df[(df["CAMPO_AMPLIO"] != "NO_REGISTRA") & 
             (df["PROVINCIA_RESIDENCIA"] != "NO_REGISTRA") &
             (df["PROVINCIA_RESIDENCIA"] != "ZONAS NO DELIMITADAS") &
-            (df["NIVEL_FORMACIÓN"] != "TERCER NIVEL TECNICO-TECNOLOGICO SUPERIOR")
-            (df["AÑO"] == 2022)]
+            (df["NIVEL_FORMACIÓN"] != "TERCER NIVEL TECNICO-TECNOLOGICO SUPERIOR")]
     return df
 
 # URL de descarga de Google Drive
