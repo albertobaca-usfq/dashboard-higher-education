@@ -277,7 +277,7 @@ def update_graph(provincia):
     # Crear el grafo
     G = nx.Graph()
     G.add_node(provincia)
-    node_sizes = [5000] + [value * 1 for value in tot_values]  # Tamaño mayor para el nodo raíz, reducir secundarios
+    node_sizes = [10000] + [value * 0.75 for value in tot_values]  # Tamaño mayor para el nodo raíz, reducir secundarios
     
     for i, node in enumerate(secondary_nodes):
         G.add_node(node)
