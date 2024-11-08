@@ -277,7 +277,7 @@ def update_graph(provincia):
     # Crear el grafo
     G = nx.Graph()
     G.add_node(provincia)
-    node_sizes = [10000] + [value * 0.75 for value in tot_values]  # Tamaño mayor para el nodo raíz, reducir secundarios
+    node_sizes = [15000] + [value * 0.5 for value in tot_values]  # Tamaño mayor para el nodo raíz, reducir secundarios
     
     for i, node in enumerate(secondary_nodes):
         G.add_node(node)
@@ -299,7 +299,7 @@ def update_graph(provincia):
     nx.draw_networkx_labels(G, pos, labels=labels, font_size=7, font_color="darkblue")
     nx.draw_networkx_labels(G, pos, labels={provincia: provincia}, font_size=12, font_weight="bold", font_color="white")
 
-    plt.title(f"Grafo de distribucion de estudiantes en {provincia}", fontsize=20)
+    plt.title(f"Grafo de distribucion de estudiantes en {provincia}", fontsize=30)
     st.pyplot(plt)
 
 # Llamar a la función para dibujar el grafo con la provincia seleccionada
