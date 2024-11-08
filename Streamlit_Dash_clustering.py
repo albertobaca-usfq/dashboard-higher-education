@@ -17,13 +17,6 @@ def load_data(url):
     return pd.read_excel(output, engine='openpyxl')
 
 def preprocess_data(df):
-    # Verificar nombres de columnas
-    st.write("Columnas en el DataFrame:", df.columns)
-    
-    # Verificar si la columna 'NIVEL_FORMACIÓN' existe
-    if 'NIVEL_FORMACIÓN' not in df.columns:
-        st.error("La columna 'NIVEL_FORMACIÓN' no existe en el DataFrame.")
-        return df  # Devuelve el DataFrame sin cambios si falta la columna
 
     # Realizar los reemplazos y filtrados de datos
     df['MODALIDAD'] = df['MODALIDAD'].replace(['HIBRIDA', 'DUAL'], 'SEMIPRESENCIAL')
