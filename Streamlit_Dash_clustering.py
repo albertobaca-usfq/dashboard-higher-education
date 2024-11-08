@@ -176,60 +176,13 @@ fig.update_layout(
     width=1000,
     height=1000
 )
-fig.write_image("sunburst_estudiantes.png")
+#fig.write_image("sunburst_estudiantes.png")
 # Mostramos el gráfico
 fig.show()
 
 
 # In[123]:
-
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import squarify  # Biblioteca para treemaps
-
-# Agrupamos por provincia y obtenemos el top 10
-provincia_totales = df_matriculas.groupby('PROVINCIA_RESIDENCIA')['tot'].sum().reset_index()
-top_10_provincias = provincia_totales.nlargest(10, 'tot')
-
-# Calculamos la suma de las demás provincias y creamos la fila "Otros"
-otros = pd.DataFrame({
-    'PROVINCIA_RESIDENCIA': ['Otros'],
-    'tot': [provincia_totales['tot'].sum() - top_10_provincias['tot'].sum()]
-})
-
-# Concatenamos el top 10 con la categoría "Otros" y ordenamos de mayor a menor
-treemap_data = pd.concat([top_10_provincias, otros], ignore_index=True).sort_values(by='tot', ascending=False)
-
-# Definimos la paleta de colores en formato hexadecimal para cada rango
-colors = []
-for value in treemap_data['tot']:
-    if value > 100000:
-        colors.append('#D4AF37')  # Dorado pastel para > 100000
-    elif 30000 <= value <= 100000:
-        colors.append('#808080')  # Gris oscuro pastel para 100000 >= valor >= 30000
-    else:
-        colors.append('#D3D3D3')  # Gris claro pastel para < 30000
-
-# Crear el treemap
-# plt.figure(figsize=(12, 8))
-squarify.plot(
-    sizes=treemap_data['tot'],
-    label=treemap_data['PROVINCIA_RESIDENCIA'] + "\n" + treemap_data['tot'].apply(lambda x: f'{x:,}'),
-    color=colors,
-    alpha=0.8,
-    text_kwargs={'fontsize': 12, 'color': 'black'}
-)
-
-# Títulos y ajustes
-plt.title("Estudiantes por Provincia de residencia (Top 10)", fontsize=16)
-plt.axis('off')  # Ocultar los ejes
-
-# Guardar el gráfico
-plt.savefig("top_10_estudiantes_provincia_treemap.png", format="png", dpi=300)
-
-# Mostrar el gráfico
-fig.show()
+#Construir Treemap
 
 # In[124]:
 
