@@ -6,46 +6,38 @@ import gdown
 
 st.title('Higher Education in Ecuador')
 
-# Enlace de Google Drive para el archivo
+@st.cache_data
+def load_data(url):
+    output = "base_matricula_datosabiertos.xlsx"
+    gdown.download(url, output, quiet=False)
+    return pd.read_excel(output, engine='openpyxl')
+
+@st.cache_data
+def preprocess_data(df):
+    # Realiza todos los reemplazos y filtrados de datos aquí
+    df['MODALIDAD'] = df['MODALIDAD'].replace(['HIBRIDA', 'DUAL'], 'SEMIPRESENCIAL')
+    df['NIVEL_FORMACIÓN'] = df['NIVEL_FORMACIÓN'].replace(['TERCER NIVEL O PREGRADO'], 'PREGRADO')
+    df['NIVEL_FORMACIÓN'] = df['NIVEL_FORMACIÓN'].replace(['CUARTO NIVEL O POSGRADO'], 'POSGRADO')
+    df['CAMPO_AMPLIO'] = df['CAMPO_AMPLIO'].replace(['CIENCIAS SOCIALES, PERIODISMO, INFORMACION Y DERECHO'], 'CIENCIAS SOCIALES Y DERECHO')
+    df['CAMPO_AMPLIO'] = df['CAMPO_AMPLIO'].replace(['AGRICULTURA, SILVICULTURA, PESCA Y VETERINARIA'], 'AGRICULTURA Y VETERINARIA')
+    df['CAMPO_AMPLIO'] = df['CAMPO_AMPLIO'].replace(['CIENCIAS NATURALES, MATEMATICAS Y ESTADISTICA'], 'CIENCIAS NATURALES Y MATEMATICAS')
+    df['CAMPO_AMPLIO'] = df['CAMPO_AMPLIO'].replace(['INGENIERIA, INDUSTRIA Y CONSTRUCCION'], 'INGENIERIA E INDUSTRIA')
+    df['CAMPO_AMPLIO'] = df['CAMPO_AMPLIO'].replace(['TECNOLOGIAS DE LA INFORMACION Y LA COMUNICACION (TIC)'], 'TECNOLOGIAS DE LA INFORMACION')
+    df['TIPO_FINANCIAMIENTO'] = df['TIPO_FINANCIAMIENTO'].replace(['PARTICULAR COFINANCIADA'], 'PARTICULAR')
+    df['TIPO_FINANCIAMIENTO'] = df['TIPO_FINANCIAMIENTO'].replace(['PARTICULAR AUTOFINANCIADA'], 'PARTICULAR')
+    df = df[(df["CAMPO_AMPLIO"] != "NO_REGISTRA") & 
+            (df["PROVINCIA_RESIDENCIA"] != "NO_REGISTRA") &
+            (df["PROVINCIA_RESIDENCIA"] != "ZONAS NO DELIMITADAS") &
+            (df["NIVEL_FORMACIÓN"] != "TERCER NIVEL TECNICO-TECNOLOGICO SUPERIOR")
+            (df["AÑO"] == 2022)]
+    return df
+
+# URL de descarga de Google Drive
 url = "https://drive.google.com/uc?id=1M3QXxjoUjI5-6bYRZMb95BJkI0i4jT5Z"
 
-# Descargar el archivo desde Google Drive
-output = "base_matricula_datosabiertos.xlsx"
-gdown.download(url, output, quiet=False)
-
-# Cargar el archivo de Excel descargado
-df_matricula = pd.read_excel(output, engine='openpyxl')
-st.write("Shape of the full dataset:", df_matricula.shape)
-
-# Filtrar solo los registros donde "AÑO" es igual a 2022
-df_matriculas = df_matricula[df_matricula["AÑO"] == 2022]
-st.write("Shape of the 2022 dataset:", df_matriculas.shape)
-
-
-# In[117]:
-
-
-df_matriculas['MODALIDAD'] = df_matriculas['MODALIDAD'].replace(['HIBRIDA', 'DUAL'], 'SEMIPRESENCIAL')
-df_matriculas['NIVEL_FORMACIÓN'] = df_matriculas['NIVEL_FORMACIÓN'].replace(['TERCER NIVEL O PREGRADO'], 'PREGRADO')
-df_matriculas['NIVEL_FORMACIÓN'] = df_matriculas['NIVEL_FORMACIÓN'].replace(['CUARTO NIVEL O POSGRADO'], 'POSGRADO')
-df_matriculas['CAMPO_AMPLIO'] = df_matriculas['CAMPO_AMPLIO'].replace(['CIENCIAS SOCIALES, PERIODISMO, INFORMACION Y DERECHO'], 'CIENCIAS SOCIALES Y DERECHO')
-df_matriculas['CAMPO_AMPLIO'] = df_matriculas['CAMPO_AMPLIO'].replace(['AGRICULTURA, SILVICULTURA, PESCA Y VETERINARIA'], 'AGRICULTURA Y VETERINARIA')
-df_matriculas['CAMPO_AMPLIO'] = df_matriculas['CAMPO_AMPLIO'].replace(['CIENCIAS NATURALES, MATEMATICAS Y ESTADISTICA'], 'CIENCIAS NATURALES Y MATEMATICAS')
-df_matriculas['CAMPO_AMPLIO'] = df_matriculas['CAMPO_AMPLIO'].replace(['INGENIERIA, INDUSTRIA Y CONSTRUCCION'], 'INGENIERIA E INDUSTRIA')
-df_matriculas['CAMPO_AMPLIO'] = df_matriculas['CAMPO_AMPLIO'].replace(['TECNOLOGIAS DE LA INFORMACION Y LA COMUNICACION (TIC)'], 'TECNOLOGIAS DE LA INFORMACION')
-df_matriculas['TIPO_FINANCIAMIENTO'] = df_matriculas['TIPO_FINANCIAMIENTO'].replace(['PARTICULAR COFINANCIADA'], 'PARTICULAR')
-df_matriculas['TIPO_FINANCIAMIENTO'] = df_matriculas['TIPO_FINANCIAMIENTO'].replace(['PARTICULAR AUTOFINANCIADA'], 'PARTICULAR')
-
-df_matriculas = df_matriculas[
-    (df_matriculas["CAMPO_AMPLIO"] != "NO_REGISTRA") & 
-    (df_matriculas["PROVINCIA_RESIDENCIA"] != "NO_REGISTRA") &
-    (df_matriculas["PROVINCIA_RESIDENCIA"] != "ZONAS NO DELIMITADAS") &
-    (df_matriculas["NIVEL_FORMACIÓN"] != "TERCER NIVEL TECNICO-TECNOLOGICO SUPERIOR")
-      
-]
-
-print("Tamaño después de eliminar registros:", df_matriculas.shape)
-
+# Cargar y procesar datos
+df_matricula = load_data(url)
+df_matriculas = preprocess_data(df_matricula)
 
 # In[121]:
 
@@ -242,21 +234,21 @@ import networkx as nx
 import pandas as pd
 
 # Suponiendo que ya tienes el dataframe `df_matriculas`
-# Aquí se agrupa el dataset para evitar duplicados y sumar 'tot' por combinación de provincia y campo amplio
-df_grouped = df_matriculas.groupby(['PROVINCIA_RESIDENCIA', 'CAMPO_AMPLIO'])['tot'].sum().reset_index()
+@st.cache_data
+def get_tot_values_by_province(df):
+    df_grouped = df.groupby(['PROVINCIA_RESIDENCIA', 'CAMPO_AMPLIO'])['tot'].sum().reset_index()
+    provincias = df_grouped["PROVINCIA_RESIDENCIA"].unique().tolist()
+    secondary_nodes = df_grouped["CAMPO_AMPLIO"].unique().tolist()
+    tot_values_by_province = {
+        provincia: df_grouped[df_grouped['PROVINCIA_RESIDENCIA'] == provincia]
+            .set_index('CAMPO_AMPLIO')['tot']
+            .reindex(secondary_nodes, fill_value=0)
+            .tolist()
+        for provincia in provincias
+    }
+    return tot_values_by_province, provincias, secondary_nodes
 
-# Extraer lista única de provincias y campos amplios del dataset agrupado
-provincias = df_grouped["PROVINCIA_RESIDENCIA"].unique().tolist()
-secondary_nodes = df_grouped["CAMPO_AMPLIO"].unique().tolist()
-
-# Generar 'tot_values_by_province' que mapea cada provincia con una lista de valores 'tot' por cada campo amplio
-tot_values_by_province = {
-    provincia: df_grouped[df_grouped['PROVINCIA_RESIDENCIA'] == provincia]
-        .set_index('CAMPO_AMPLIO')['tot']
-        .reindex(secondary_nodes, fill_value=0)
-        .tolist()
-    for provincia in provincias
-}
+tot_values_by_province, provincias, secondary_nodes = get_tot_values_by_province(df_matriculas)
 
 # Crear el selector de provincia con Streamlit
 provincia = st.selectbox('Province:', provincias, index=13)  # Valor inicial
