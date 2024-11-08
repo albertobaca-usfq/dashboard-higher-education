@@ -6,13 +6,16 @@ import gdown
 
 st.title('Higher Education in Ecuador')
 
+import streamlit as st
+import pandas as pd
+import gdown
+
 @st.cache_data
 def load_data(url):
     output = "base_matricula_datosabiertos.xlsx"
     gdown.download(url, output, quiet=False)
     return pd.read_excel(output, engine='openpyxl')
 
-@st.cache_data
 def preprocess_data(df):
     # Realiza todos los reemplazos y filtrados de datos aquí
     df['MODALIDAD'] = df['MODALIDAD'].replace(['HIBRIDA', 'DUAL'], 'SEMIPRESENCIAL')
