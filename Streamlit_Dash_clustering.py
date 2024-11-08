@@ -226,7 +226,7 @@ squarify.plot(
 )
 
 # Títulos y ajustes
-ax.set_title("Estudiantes por Provincia de residencia (Top 10)", fontsize=16)
+ax.set_title("Students for Province (Top 10)", fontsize=16)
 ax.axis('off')  # Ocultar los ejes
 
 # Mostrar el gráfico en Streamlit
