@@ -2,25 +2,24 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import gdown
 
+st.title('Higher Education in Ecuador')
 
-st.title('Higer education in Ecuador')
+# Enlace de Google Drive para el archivo
+url = "https://drive.google.com/uc?id=1M3QXxjoUjI5-6bYRZMb95BJkI0i4jT5Z"
 
-#!/usr/bin/env python
-# coding: utf-8
+# Descargar el archivo desde Google Drive
+output = "base_matricula_datosabiertos.xlsx"
+gdown.download(url, output, quiet=False)
 
-# ### Uso de unsupervised learning para la identificación de Perfiles Educativos y Sociales en el ámbito de la Educación Superior
-
-# In[115]:
-
-
-# Cargar el archivo de Excel
-df_matricula = pd.read_excel("base_matricula_datosabiertos.xlsx", engine='openpyxl')
-print(df_matricula.shape)
+# Cargar el archivo de Excel descargado
+df_matricula = pd.read_excel(output, engine='openpyxl')
+st.write("Shape of the full dataset:", df_matricula.shape)
 
 # Filtrar solo los registros donde "AÑO" es igual a 2022
 df_matriculas = df_matricula[df_matricula["AÑO"] == 2022]
-print(df_matriculas.shape)
+st.write("Shape of the 2022 dataset:", df_matriculas.shape)
 
 
 # In[117]:
