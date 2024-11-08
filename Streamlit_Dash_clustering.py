@@ -100,7 +100,7 @@ fig.update_layout(
     annotations=[{
         'text': f'{total_carreras}',  # Muestra solo el número en el centro
         'x': 0.5,
-        'y': 0.48,
+        'y': 0.5,
         'font_size': 24,
         'showarrow': False,
         'font_color': 'black'
