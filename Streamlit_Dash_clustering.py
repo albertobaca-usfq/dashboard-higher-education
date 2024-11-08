@@ -6,10 +6,6 @@ import gdown
 
 st.title('Higher Education in Ecuador')
 
-import streamlit as st
-import pandas as pd
-import gdown
-
 @st.cache_data
 def load_data(url):
     output = "base_matricula_datosabiertos.xlsx"
