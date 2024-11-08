@@ -34,7 +34,8 @@ def preprocess_data(df):
     df = df[(df["CAMPO_AMPLIO"] != "NO_REGISTRA") & 
             (df["PROVINCIA_RESIDENCIA"] != "NO_REGISTRA") &
             (df["PROVINCIA_RESIDENCIA"] != "ZONAS NO DELIMITADAS") &
-            (df["NIVEL_FORMACIÓN"] != "TERCER NIVEL TECNICO-TECNOLOGICO SUPERIOR")]
+            (df["NIVEL_FORMACIÓN"] != "TERCER NIVEL TECNICO-TECNOLOGICO SUPERIOR") &        
+            (df["AÑO"] == 2022)]
     return df
 
 # URL de descarga de Google Drive
