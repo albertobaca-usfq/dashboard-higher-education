@@ -101,7 +101,7 @@ fig.update_layout(
         'text': f'{total_carreras}',  # Muestra solo el número en el centro
         'x': 0.5,
         'y': 0.5,
-        'font_size': 24,
+        'font_size': 16,
         'showarrow': False,
         'font_color': 'black'
     }],
